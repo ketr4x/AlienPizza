@@ -30,7 +30,7 @@ class _Screen2State extends State<Screen2> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:5000/api/evaluate'),
+        Uri.parse('http://127.0.0.1:8000/api/evaluate'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'toppings': toppings}),
       );

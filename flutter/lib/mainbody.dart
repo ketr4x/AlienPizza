@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -22,7 +23,7 @@ class _MainBodyState extends State<MainBody> {
 
   Future<void> fetchToppings() async {
     try {
-      final response = await http.get(Uri.parse('http://127.0.0.1:5000/api/toppings'));
+      final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/toppings'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<String> toppings = List<String>.from(data['toppings']);
@@ -36,6 +37,9 @@ class _MainBodyState extends State<MainBody> {
         });
       }
     } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
       setState(() {
         isLoading = false;
       });

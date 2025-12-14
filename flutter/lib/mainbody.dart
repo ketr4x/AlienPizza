@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'page2.dart';
 
 class MainBody extends StatefulWidget {
   const MainBody({super.key});
@@ -41,41 +42,68 @@ class _MainBodyState extends State<MainBody> {
     }
   }
 
+  void _navigateToScreen2() async {
+    final selectedToppings = checkboxData.values
+        .where((item) => item.isChecked)
+        .map((item) => item.label)
+        .toList();
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Alien Pizza Evaluation'),
+          ),
+          body: Screen2(selectedToppings: selectedToppings),
+        ),
+      ),
+    );
+
+    await fetchToppings();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Column(
-      children: [
-        Expanded(
-          child: GridView.count(
-            crossAxisCount: 2,
-            children: List.generate(checkboxData.length, (index) {
-              return Card(
-                child: Row(
-                  children: [
-                    Checkbox(
-                      value: checkboxData[index]?.isChecked ?? false,
-                      onChanged: (value) {
-                        setState(() {
-                          if (checkboxData[index] != null) {
-                            checkboxData[index]!.isChecked = value ?? false;
-                          }
-                        });
-                      },
-                    ),
-                    Expanded(
-                      child: Text(checkboxData[index]?.label ?? ''),
-                    ),
-                  ],
-                ),
-              );
-            }),
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              children: List.generate(checkboxData.length, (index) {
+                return Card(
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: checkboxData[index]?.isChecked ?? false,
+                        onChanged: (value) {
+                          setState(() {
+                            if (checkboxData[index] != null) {
+                              checkboxData[index]!.isChecked = value ?? false;
+                            }
+                          });
+                        },
+                      ),
+                      Expanded(
+                        child: Text(checkboxData[index]?.label ?? ''),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToScreen2,
+        child: const Icon(Icons.arrow_forward),
+      ),
     );
   }
 }

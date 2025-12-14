@@ -27,7 +27,7 @@ def evaluate():
                 "role": "user",
                 "content":
                     f'''    
-                    Provide a rating in a scale of 0/100 for a pizza with these toppings: {toppings}.
+                    Provide a compatibility rating in a scale of 0/100 for a pizza with these toppings: {toppings}. If the pizza is compatible with the species, it should receive a high score.
                     Provide the name for said pizza.
                     Provide a little backstory about why it suits Humans, Giant Raccoons and Friendly Aliens.   
                     Reply with a JSON object only, no extra text. Example reply:

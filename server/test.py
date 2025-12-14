@@ -8,5 +8,5 @@ print(response.text)
 
 url = 'http://127.0.0.1:5000/api/toppings'
 
-response = requests.post(url)
+response = requests.get(url)
 print(response.text)

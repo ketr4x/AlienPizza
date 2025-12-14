@@ -2,7 +2,7 @@ from flask import Flask, request
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
-
+ 
 app = Flask(__name__)
 load_dotenv()
 
@@ -41,7 +41,7 @@ def evaluate():
 
     return str(response.choices[0].message.content)
 
-@app.route('/api/toppings', methods=['POST'])
+@app.route('/api/toppings')
 def toppings():
     client = OpenAI(
         api_key=os.environ.get("AI_KEY", ""),

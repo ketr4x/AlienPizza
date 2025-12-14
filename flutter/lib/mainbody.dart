@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MainBody extends StatefulWidget {
   const MainBody({super.key});
@@ -9,9 +11,42 @@ class MainBody extends StatefulWidget {
 
 class _MainBodyState extends State<MainBody> {
   Map<int, CheckboxItem> checkboxData = {};
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchToppings();
+  }
+
+  Future<void> fetchToppings() async {
+    try {
+      final response = await http.get(Uri.parse('http://127.0.0.1:5000/api/toppings'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<String> toppings = List<String>.from(data['toppings']);
+
+        setState(() {
+          checkboxData = {
+            for (int i = 0; i < toppings.length; i++)
+              i: CheckboxItem(isChecked: false, label: toppings[i])
+          };
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Column(
       children: [
         Expanded(
@@ -31,7 +66,9 @@ class _MainBodyState extends State<MainBody> {
                         });
                       },
                     ),
-                    Text(checkboxData[index]?.label ?? ''),
+                    Expanded(
+                      child: Text(checkboxData[index]?.label ?? ''),
+                    ),
                   ],
                 ),
               );

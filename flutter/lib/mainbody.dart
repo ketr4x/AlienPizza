@@ -72,6 +72,13 @@ class _MainBodyState extends State<MainBody> {
     return Scaffold(
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Select your pizza toppings!',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
@@ -100,10 +107,12 @@ class _MainBodyState extends State<MainBody> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToScreen2,
-        child: const Icon(Icons.arrow_forward),
-      ),
+      floatingActionButton: checkboxData.values.any((item) => item.isChecked)
+        ? FloatingActionButton(
+          onPressed: _navigateToScreen2,
+          child: const Icon(Icons.arrow_forward),
+        )
+        : null,
     );
   }
 }

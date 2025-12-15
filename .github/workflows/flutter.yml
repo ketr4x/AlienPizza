@@ -2,11 +2,11 @@ name: Flutter
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths:
       - 'flutter/**'
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths:
       - 'flutter/**'
   workflow_dispatch:

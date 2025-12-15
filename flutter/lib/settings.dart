@@ -13,6 +13,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _toppingsController = TextEditingController();
   Color _selectedColor = Colors.lightBlue;
+  bool _soundEnabled = true;
 
   Future<void> setConfig(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -29,6 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     _loadToppingsCount();
     _loadThemeColor();
+    _loadSoundPreference();
   }
 
   Future<void> _loadToppingsCount() async {
@@ -43,6 +45,21 @@ class _SettingsPageState extends State<SettingsPage> {
     if (colorValue != null) {
       setState(() {
         _selectedColor = Color(int.parse(colorValue, radix: 16));
+      });
+    }
+  }
+
+  Future<void> _loadSoundPreference() async {
+    final soundEnabled = await getConfig('sound_enabled');
+    if (soundEnabled == null) {
+      // Set default to true if not set
+      await setConfig('sound_enabled', 'true');
+      setState(() {
+        _soundEnabled = true;
+      });
+    } else {
+      setState(() {
+        _soundEnabled = soundEnabled != 'false';
       });
     }
   }
@@ -136,6 +153,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
               ),
+            ),
+            SwitchListTile(
+              title: const Text('Sound Effects'),
+              subtitle: const Text('Enable or disable sound effects'),
+              value: _soundEnabled,
+              onChanged: (bool value) async {
+                setState(() {
+                  _soundEnabled = value;
+                });
+                await setConfig('sound_enabled', value.toString());
+              },
             ),
           ],
         ),

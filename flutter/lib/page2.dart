@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Screen2 extends StatefulWidget {
   final List<String> selectedToppings;
@@ -26,7 +27,12 @@ class _Screen2State extends State<Screen2> {
 
   Future<void> _playSound() async {
     try {
-      await _audioPlayer.play(AssetSource('spacesound.mp3'));
+      final prefs = await SharedPreferences.getInstance();
+      final soundEnabled = prefs.getString('sound_enabled');
+
+      if (soundEnabled == null || soundEnabled != 'false') {
+        await _audioPlayer.play(AssetSource('spacesound.mp3'));
+      }
     } catch (e) {
       print('Error playing sound: $e');
     }

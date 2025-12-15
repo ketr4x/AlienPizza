@@ -80,7 +80,7 @@ async def toppings(count: int = 12):
     return json.loads(response.choices[0].message.content)
 
 app.include_router(api_router)
-flutter_build_path = "../flutter/build/web"
+flutter_build_path = "flutter/build/web"
 app.mount("/assets", StaticFiles(directory=f"{flutter_build_path}/assets"), name="assets")
 
 @app.get("/{full_path:path}")

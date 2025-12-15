@@ -18,8 +18,6 @@ An AI-powered pizza compatibility checker that evaluates pizza combinations for 
 **Downloads**: https://github.com/ketr4x/AlienPizza/releases/
 - `.apk` - Android (Recommended)
 - `build_web_*.zip` - Local browser
-- `.exe` - Windows
-- iOS/macOS builds
 
 ## Installation
 ### Prerequisites
@@ -68,7 +66,7 @@ heroku create your-app-name
 ```bash
 heroku config:set API_KEY=your_api_key
 heroku config:set API_URL=https://api.openai.com/v1
-heroku config:set AI_MODEL=gpt-3.5-turbo
+heroku config:set AI_MODEL=gpt-5-mini
 ```
 
 4. Deploy:
@@ -104,9 +102,6 @@ flutter build apk
 
 # For Web
 flutter build web
-
-# For Windows
-flutter build windows
 ```
 
 ## Usage

@@ -9,14 +9,24 @@ import 'settings.dart';
 
 class MainBody extends StatefulWidget {
   final String title;
-  const MainBody({super.key, required this.title, required this.onThemeChanged});
   final VoidCallback onThemeChanged;
+
+  const MainBody({
+    super.key,
+    required this.title,
+    required this.onThemeChanged,
+  });
 
   @override
   State<MainBody> createState() => _MainBodyState();
 }
 
 class _MainBodyState extends State<MainBody> {
+  static const double _imageWidth = 280.0;
+  static const int _gridCrossAxisCount = 2;
+  static const double _gridChildAspectRatio = 2.2;
+  static const double _fabSpacing = 12.0;
+
   Map<int, CheckboxItem> checkboxData = {};
   bool isLoading = true;
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -26,6 +36,12 @@ class _MainBodyState extends State<MainBody> {
     super.initState();
     fetchToppings();
     _playBackgroundMusic();
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
   Future<void> _playBackgroundMusic() async {
@@ -51,7 +67,9 @@ class _MainBodyState extends State<MainBody> {
       final prefs = await SharedPreferences.getInstance();
       final toppingsCount = prefs.getString('toppings_count') ?? '14';
       final response = await http.get(
-        Uri.parse('https://alien-pizza-28ebb921ad43.herokuapp.com/api/toppings?count=$toppingsCount')
+        Uri.parse(
+          'https://alien-pizza-28ebb921ad43.herokuapp.com/api/toppings?count=$toppingsCount',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -68,7 +86,7 @@ class _MainBodyState extends State<MainBody> {
       }
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        print('Error fetching toppings: $e');
       }
       setState(() {
         isLoading = false;
@@ -76,7 +94,7 @@ class _MainBodyState extends State<MainBody> {
     }
   }
 
-  void _navigateToScreen2() async {
+  Future<void> _navigateToScreen2() async {
     final selectedToppings = checkboxData.values
         .where((item) => item.isChecked)
         .map((item) => item.label)
@@ -98,6 +116,76 @@ class _MainBodyState extends State<MainBody> {
     await fetchToppings();
   }
 
+  Future<void> _navigateToSettings() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SettingsPage(
+          onThemeChanged: widget.onThemeChanged,
+        ),
+      ),
+    );
+    fetchToppings();
+    _playBackgroundMusic();
+  }
+
+  Widget _buildToppingCard(int index) {
+    final isChecked = checkboxData[index]?.isChecked ?? false;
+
+    return Card(
+      elevation: isChecked ? 8 : 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isChecked
+              ? Theme.of(context).colorScheme.primary
+              : Colors.transparent,
+          width: 2,
+        ),
+      ),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            if (checkboxData[index] != null) {
+              checkboxData[index]!.isChecked = !checkboxData[index]!.isChecked;
+            }
+          });
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          child: Row(
+            children: [
+              Checkbox(
+                value: isChecked,
+                onChanged: (value) {
+                  setState(() {
+                    if (checkboxData[index] != null) {
+                      checkboxData[index]!.isChecked = value ?? false;
+                    }
+                  });
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  checkboxData[index]?.label ?? '',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight:
+                        isChecked ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -105,134 +193,154 @@ class _MainBodyState extends State<MainBody> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
+          elevation: 0,
           actions: [
             IconButton(
               icon: const Icon(Icons.settings),
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SettingsPage(onThemeChanged: widget.onThemeChanged),
-                  ),
-                );
-                fetchToppings();
-                _playBackgroundMusic(); // Resume music after returning from settings
-              },
+              onPressed: _navigateToSettings,
             ),
           ],
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 24),
+              Text(
+                'Loading toppings...',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ],
+          ),
+        ),
       );
     }
+
+    final selectedCount = checkboxData.values
+        .where((item) => item.isChecked)
+        .length;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SettingsPage(onThemeChanged: widget.onThemeChanged),
-                ),
-              );
-              fetchToppings();
-              _playBackgroundMusic(); // Resume music after returning from settings
-            },
+            onPressed: _navigateToSettings,
+            tooltip: 'Settings',
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.asset(
-                'assets/images/alien_pizza.png',
-                width: 250,
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Theme.of(context).colorScheme.inversePrimary,
+                    Theme.of(context).scaffoldBackgroundColor,
+                  ],
+                ),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Hero(
+                    tag: 'pizza_logo',
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/images/alien_pizza.png',
+                        width: _imageWidth,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Select Your Pizza Toppings',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  if (selectedCount > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '$selectedCount topping${selectedCount != 1 ? 's' : ''} selected',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Select your pizza toppings!',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .headlineSmall,
+              child: GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: _gridCrossAxisCount,
+                childAspectRatio: _gridChildAspectRatio,
+                crossAxisSpacing: 12.0,
+                mainAxisSpacing: 12.0,
+                children: List.generate(
+                  checkboxData.length,
+                  (index) => _buildToppingCard(index),
+                ),
               ),
             ),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              childAspectRatio: 2,
-              padding: const EdgeInsets.all(8.0),
-              crossAxisSpacing: 4,
-              mainAxisSpacing: 4,
-              children: List.generate(checkboxData.length, (index) {
-                return Card(
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        if (checkboxData[index] != null) {
-                          checkboxData[index]!.isChecked =
-                          !checkboxData[index]!.isChecked;
-                        }
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        Checkbox(
-                          value: checkboxData[index]?.isChecked ?? false,
-                          onChanged: (value) {
-                            setState(() {
-                              if (checkboxData[index] != null) {
-                                checkboxData[index]!.isChecked = value ?? false;
-                              }
-                            });
-                          },
-                        ),
-                        Expanded(
-                          child: Text(checkboxData[index]?.label ?? ''),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-            ),
+            const SizedBox(height: 80),
           ],
         ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton(
+          FloatingActionButton.extended(
             heroTag: 'refresh',
             onPressed: fetchToppings,
-            child: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Refresh'),
+            tooltip: 'Get new toppings',
           ),
-          if (checkboxData.values.any((item) => item.isChecked)) ...[
-            const SizedBox(width: 12),
-            FloatingActionButton(
+          if (selectedCount > 0) ...[
+            const SizedBox(width: _fabSpacing),
+            FloatingActionButton.extended(
               heroTag: 'forward',
               onPressed: _navigateToScreen2,
-              child: const Icon(Icons.arrow_forward),
+              icon: const Icon(Icons.restaurant),
+              label: const Text('Evaluate'),
+              tooltip: 'Evaluate pizza',
             ),
           ],
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
   }
 }
 
@@ -240,5 +348,8 @@ class CheckboxItem {
   bool isChecked;
   String label;
 
-  CheckboxItem({required this.isChecked, required this.label});
+  CheckboxItem({
+    required this.isChecked,
+    required this.label,
+  });
 }

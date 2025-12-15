@@ -122,29 +122,29 @@ class _MainBodyState extends State<MainBody> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-
-
-        Image.asset(
-          'assets/images/alien_pizza.png',
-          width: 250,
-        ),
-
-        const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Select your pizza toppings!',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineSmall,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
+                'assets/images/alien_pizza.png',
+                width: 250,
+              ),
             ),
-          ),
-          Expanded(
-            child: GridView.count(
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Select your pizza toppings!',
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .headlineSmall,
+              ),
+            ),
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
               childAspectRatio: 2,
               padding: const EdgeInsets.all(8.0),
@@ -182,8 +182,8 @@ class _MainBodyState extends State<MainBody> {
                 );
               }),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,

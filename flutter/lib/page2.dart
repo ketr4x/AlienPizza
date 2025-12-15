@@ -80,12 +80,12 @@ class _Screen2State extends State<Screen2> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Text('Rating: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text('Rating: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                       Text('${_pizzaData!['rating']}/100', style: const TextStyle(fontSize: 18)),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('Backstory:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const Text('Backstory:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                   const SizedBox(height: 8),
                   Text(_pizzaData!['backstory'] ?? ''),
                 ],

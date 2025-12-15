@@ -12,9 +12,6 @@ on:
   workflow_dispatch:
   release:
     types: [published]
-    branches: [ "master" ]
-    tags:
-      - 'flutter*'
 
 jobs:
   build:

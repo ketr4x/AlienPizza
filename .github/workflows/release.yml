@@ -33,10 +33,6 @@ jobs:
       - name: Install GitHub CLI
         run: sudo apt-get install gh
 
-      - name: Get version from data.json
-        id: version
-        run: echo "version=$(jq -r .version data.json)" >> $GITHUB_OUTPUT
-
       - name: Get version from pubspec.yaml
         id: version
         run: |
@@ -62,9 +58,9 @@ jobs:
       - name: Set signing env vars
         run: |
           echo "MYAPP_UPLOAD_STORE_FILE=./flutter/android/app/upload-keystore.jks" >> $GITHUB_ENV
-          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
-          echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
-          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEY }}" >> $GITHUB_ENV
+          echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEY }}" >> $GITHUB_ENV
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEY }}" >> $GITHUB_ENV
 
       - uses: subosito/flutter-action@v2
         with:
@@ -85,9 +81,9 @@ jobs:
         run: >
           flutter build apk --release
           -P MYAPP_UPLOAD_STORE_FILE=upload-keystore.jks
-          -P MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}
-          -P MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEY_ALIAS }}
-          -P MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}
+          -P MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEY }}
+          -P MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEY }}
+          -P MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEY }}
         working-directory: ./flutter/
 
       - name: Make a web build
@@ -146,25 +142,4 @@ jobs:
             ./build_web_${{ steps.version.outputs.version }}.zip
           name: "[Flutter] v${{ steps.version.outputs.version }}"
           body: "${{ steps.commit.outputs.message }}"
-          draft: false
-
-      - name: Delete old Flutter release and tag
-        run: |
-          gh release delete "Flutter" --yes || echo "No Flutter release to delete"
-          git push --delete origin Flutter || echo "No Flutter tag to delete"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create new Flutter release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: Flutter
-          files: |
-            ./flutter/build/app/outputs/flutter-apk/app-release.apk
-            ./build_web_${{ steps.version.outputs.version }}.zip
-          name: "[Flutter] Latest"
-          body: |
-            Latest Flutter release for all platforms
-            Version: ${{ steps.version.outputs.version }}
-            ${{ steps.commit.outputs.message }}
           draft: false

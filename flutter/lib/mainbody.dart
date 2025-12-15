@@ -153,7 +153,7 @@ class _MainBodyState extends State<MainBody> {
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
           child: Row(
             children: [
               Checkbox(
@@ -168,17 +168,22 @@ class _MainBodyState extends State<MainBody> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
               ),
               Expanded(
                 child: Text(
                   checkboxData[index]?.label ?? '',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 13,
                     fontWeight:
                         isChecked ? FontWeight.w600 : FontWeight.normal,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 4),
             ],
           ),
         ),

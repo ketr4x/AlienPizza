@@ -21,8 +21,8 @@ async def evaluate(request: EvaluateRequest):
         raise HTTPException(status_code=400, detail="No toppings provided")
 
     client = OpenAI(
-        api_key=os.environ.get("AI_KEY", ""),
-        base_url=os.environ.get("AI_URL", "")
+        api_key=os.environ.get("API_KEY", ""),
+        base_url=os.environ.get("API_URL", "")
     )
 
     response = client.chat.completions.create(
@@ -37,7 +37,7 @@ async def evaluate(request: EvaluateRequest):
                     Provide the name for said pizza.
                     Provide a little backstory about why it suits Humans, Giant Raccoons and Friendly Aliens.   
                     Reply with a JSON object only, no extra text. Example reply:
-                    {{"rating": "98", "name": "The Cosmic Dumpster Deluxe", "backstory": "Raccoons love leftovers and texture, Aliens prefer balance and glow-energy, Humans just want it cheesy"}}c
+                    {{"rating": "98", "name": "The Cosmic Dumpster Deluxe", "backstory": "Raccoons love leftovers and texture, Aliens prefer balance and glow-energy, Humans just want it cheesy"}}
                     Return the JSON object exactly as shown.
                     Do not use tags like ```json.
                     '''
@@ -51,8 +51,8 @@ async def evaluate(request: EvaluateRequest):
 @app.get("/api/toppings")
 async def toppings():
     client = OpenAI(
-        api_key=os.environ.get("AI_KEY", ""),
-        base_url=os.environ.get("AI_URL", "")
+        api_key=os.environ.get("API_KEY", ""),
+        base_url=os.environ.get("API_URL", "")
     )
 
     response = client.chat.completions.create(

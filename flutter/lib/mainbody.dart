@@ -124,6 +124,15 @@ class _MainBodyState extends State<MainBody> {
       ),
       body: Column(
         children: [
+          const SizedBox(height: 20),
+
+
+        Image.asset(
+          'assets/images/alien_pizza.png',
+          width: 250,
+        ),
+
+        const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(

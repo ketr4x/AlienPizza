@@ -12,6 +12,7 @@ An AI-powered pizza compatibility checker that evaluates pizza combinations for 
 - Flutter-based UI with material design
 
 ## Quick Start
+[!TIP] For the best experience, consider using the Android build
 ### Hosted Version
 **Web App**: https://alienpizza.ketrax.ovh/
 

@@ -7,17 +7,31 @@ from dotenv import load_dotenv
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 load_dotenv()
+
+origins = os.environ.get(
+    "CORS_ORIGINS",
+    "https://alienpizza.ketrax.ovh,http://localhost:3000,http://127.0.0.1:3000,https://alien-pizza-28ebb921ad43.herokuapp.com/"
+).split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[o.strip() for o in origins if o.strip()],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_router = APIRouter(prefix="/api")
 
 
 class EvaluateRequest(BaseModel):
     toppings: list[str]
 
-
-@app.post("/api/evaluate")
+@api_router.post("/evaluate")
 async def evaluate(request: EvaluateRequest):
     toppings = request.toppings
 
@@ -52,7 +66,7 @@ async def evaluate(request: EvaluateRequest):
     return json.loads(response.choices[0].message.content)
 
 
-@app.get("/api/toppings")
+@api_router.get("/toppings")
 async def toppings(count: int = 12):
     client = OpenAI(
         api_key=os.environ.get("API_KEY", ""),

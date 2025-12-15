@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'page2.dart';
 import 'settings.dart';
 
@@ -18,11 +19,31 @@ class MainBody extends StatefulWidget {
 class _MainBodyState extends State<MainBody> {
   Map<int, CheckboxItem> checkboxData = {};
   bool isLoading = true;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
     super.initState();
     fetchToppings();
+    _playBackgroundMusic();
+  }
+
+  Future<void> _playBackgroundMusic() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final soundEnabled = prefs.getString('sound_enabled');
+
+      if (soundEnabled == null || soundEnabled != 'false') {
+        await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+        await _audioPlayer.play(AssetSource('mainmusic.mp3'));
+      } else {
+        await _audioPlayer.stop();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error playing background music: $e');
+      }
+    }
   }
 
   Future<void> fetchToppings() async {
@@ -95,6 +116,7 @@ class _MainBodyState extends State<MainBody> {
                   ),
                 );
                 fetchToppings();
+                _playBackgroundMusic(); // Resume music after returning from settings
               },
             ),
           ],
@@ -118,6 +140,7 @@ class _MainBodyState extends State<MainBody> {
                 ),
               );
               fetchToppings();
+              _playBackgroundMusic(); // Resume music after returning from settings
             },
           ),
         ],
@@ -204,6 +227,12 @@ class _MainBodyState extends State<MainBody> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
   }
 }
 

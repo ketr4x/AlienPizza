@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -34,7 +35,9 @@ class _Screen2State extends State<Screen2> {
         await _audioPlayer.play(AssetSource('spacesound.mp3'));
       }
     } catch (e) {
-      print('Error playing sound: $e');
+      if (kDebugMode) {
+        print('Error playing sound: $e');
+      }
     }
   }
 

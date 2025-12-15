@@ -1,13 +1,16 @@
 import json
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, APIRouter
 from pydantic import BaseModel
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import uvicorn
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI()
 load_dotenv()
+api_router = APIRouter(prefix="/api")
 
 
 class EvaluateRequest(BaseModel):
@@ -75,6 +78,17 @@ async def toppings(count: int = 12):
     )
 
     return json.loads(response.choices[0].message.content)
+
+app.include_router(api_router)
+flutter_build_path = "../flutter/build/web"
+app.mount("/assets", StaticFiles(directory=f"{flutter_build_path}/assets"), name="assets")
+
+@app.get("/{full_path:path}")
+async def serve_flutter(full_path: str):
+    file_path = os.path.join(flutter_build_path, full_path)
+    if os.path.isfile(file_path):
+        return FileResponse(file_path)
+    return FileResponse(f"{flutter_build_path}/index.html")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))

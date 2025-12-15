@@ -87,7 +87,7 @@ jobs:
         working-directory: ./flutter/
 
       - name: Make a web build
-        run: flutter build web --release --base-href /play/
+        run: flutter build web --release --base-href /
         working-directory: ./flutter/
 
       - name: Create tag for release

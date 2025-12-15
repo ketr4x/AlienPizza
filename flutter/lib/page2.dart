@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:audioplayers/audioplayers.dart';
 
 class Screen2 extends StatefulWidget {
   final List<String> selectedToppings;
@@ -14,11 +15,27 @@ class _Screen2State extends State<Screen2> {
   bool _isLoading = false;
   Map<String, dynamic>? _pizzaData;
   String? _error;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
     super.initState();
+    _playSound();
     _evaluatePizza(widget.selectedToppings);
+  }
+
+  Future<void> _playSound() async {
+    try {
+      await _audioPlayer.play(AssetSource('spacesound.mp3'));
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
   Future<void> _evaluatePizza(List<String> toppings) async {
